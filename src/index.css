@@ -11,3 +11,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.react-rater-star.is-active, .react-rater-star.will-be-active, .react-rater-star.is-active-half:before {
+  color : #f39d00 !important;
+}
+
+.react-rater {
+  font-size: 28px;
+}
+/* .footer {
+  position: absolute;
+  bottom: 0;
+  padding: 1rem !important;
+  width: 100%;
+} */
