@@ -93,12 +93,12 @@ class BookWishlist extends React.Component {
             let getBook = await ApiGetBook.wishlist(localStorage.getItem("idBrowser"))
 
             this.setState({loading:false})
+            let tempData = []
 
             if (getBook.length === 0 && getBook !== false) {
                 this.setState({errGetBook : true})
+                tempData.push(<div></div>)
             } else {
-                let tempData = []
-
                 for (const key in getBook) {
                     if (Object.hasOwnProperty.call(getBook, key)) {
                         const ele = getBook[key].dataJson;
@@ -124,8 +124,9 @@ class BookWishlist extends React.Component {
                     }
                 }
                 
-                this.setState({getWishlist:tempData})
             }
+            
+            this.setState({getWishlist:tempData})
         } else {
             this.setState({loading:false})
             this.setState({errGetBook : true})
