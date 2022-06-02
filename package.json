@@ -10,10 +10,12 @@
     "bulma": "^0.9.4",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
+    "react-notifications-component": "^4.0.1",
     "react-rater": "^6.0.1",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "react-spinners": "^0.12.0",
+    "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

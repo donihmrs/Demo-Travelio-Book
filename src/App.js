@@ -1,5 +1,6 @@
 import './App.css';
 import BookIndex from './components/book/index'
+import BookWishlist from './components/book/wishlist'
 import Header from './layouts/header'
 import Footer from './layouts/footer'
 
@@ -13,7 +14,7 @@ function App() {
         <Header />
             <Routes>
               <Route path="/" element={<BookIndex />} />
-              <Route path="/wishlist" element={<Footer />} />
+              <Route path="/wishlist" element={<BookWishlist />} />
             </Routes>
         <Footer />
       </div>

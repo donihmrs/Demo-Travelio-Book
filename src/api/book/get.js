@@ -4,10 +4,10 @@ let ApiGetBook = {}
 
 ApiGetBook.keyword = (word) => {
     if (word !== "") {
-        return axios.get("https://www.googleapis.com/books/v1/volumes?q="+word)
+        return axios.get(process.env.REACT_APP_API+"/v1/book/apiBook?word="+word)
         .then(res => {
-            if (res.data.totalItems === 0) return []
-            return res.data.items
+            if (res.data.status !== 200) return []
+            return res.data.data
         })
         .catch(err => {
             return []
@@ -17,5 +17,16 @@ ApiGetBook.keyword = (word) => {
     }
 }
 
+ApiGetBook.wishlist = (id) => {
+    if (id !== "") {
+        return axios.get(process.env.REACT_APP_API+"/v1/book/wishlist?id="+id)
+        .then(res => {
+            return res.data.data
+        })
+        .catch(err => {
+            return false
+        })
+    }
+}
 
 export default ApiGetBook;

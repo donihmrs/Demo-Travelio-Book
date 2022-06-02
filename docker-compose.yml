@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  frontend:
+    container_name: demo-travelio
+    hostname: demo-travelio
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: node:travelio
+    env_file: .env
+    ports:
+      - 80:80

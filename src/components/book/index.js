@@ -4,6 +4,11 @@ import RingLoader from "react-spinners/RingLoader";
 
 import React from "react";
 import ApiGetBook from "../../api/book/get"
+import ApiPostBook from "../../api/book/post"
+
+import { v4 as uuidv4 } from 'uuid';
+import { ReactNotifications, Store } from 'react-notifications-component'
+import 'react-notifications-component/dist/theme.css'
 
 class BookIndex extends React.Component {
     constructor(props) {
@@ -15,17 +20,19 @@ class BookIndex extends React.Component {
             dataBook : []
         };
 
-        this.authorName = ""
         this.handleTrack = this.handleTrack.bind(this);
         this.handleSearchPress = this.handleSearchPress.bind(this);
         this.handleBtnSearch = this.handleBtnSearch.bind(this);
         this.handleSaveWishlist = this.handleSaveWishlist.bind(this);
+        this.dataBook = []
     }
 
     async getBook() {
         this.setState({errGetBook : false})
         this.setState({loading:true})
         let getBook = await ApiGetBook.keyword(this.state.valSearch)
+
+        this.dataBook = getBook
 
         this.setState({loading:false})
         if (getBook.length === 0) {
@@ -38,45 +45,24 @@ class BookIndex extends React.Component {
             for (const key in getBook) {
                 if (Object.hasOwnProperty.call(getBook, key)) {
                     const ele = getBook[key];
-
-                    // eslint-disable-next-line
-                    {
-                        this.authorName = "" 
-                    }
-
-                    if (ele.volumeInfo !== undefined) {
-                        const data = ele.volumeInfo
-                        tempData.push(
-                                <div key={key}>
-                                    <div className={"columns"}>
-                                        <div className={"column is-2 mt-3"}>
-                                            {
-                                                (data.imageLinks !== undefined ?  
-                                                <img alt={data.title} src={(data.imageLinks.thumbnail !== undefined ? data.imageLinks.thumbnail : data.smallThumbnail)} /> : 
-                                                <img alt='not' src='https://www.totalsupply.com.au/assets/Uploads/220984-200.png' /> )
-                                            }
-                                        
-                                        </div>
-                                        <div className={"column is-full has-text-left mt-3"}>
-                                            <h3>Judul : {(data.title === undefined ? "-" : data.title)}</h3>
-                                            { 
-                                                (data.authors !== undefined ? 
-                                                    data.authors.forEach(author => {
-                                                        this.authorName += author + ", "
-                                                    })
-                                                : "")
-                                            }
-
-                                            <h3>Authors : {(this.authorName === "" ? "Not Show" : this.authorName)}</h3>
-                                            <br />
-                                            <Rater total={5} rating={(data.averageRating === undefined ? 0 : data.averageRating)} />
-                                            <h3>Rating : {(data.ratingsCount === undefined ? 0 : data.ratingsCount)}</h3>
-                                            <button data-id={key} onClick={this.handleSaveWishlist}  className={"button is-danger mt-3"}>Wishlist</button>
-                                        </div>
-                                    </div>
+                    tempData.push(
+                        <div key={key}>
+                            <div className={"columns"}>
+                                <div className={"column is-2 mt-3"}>
+                                    <img alt={ele.image_alt} src={ele.image} />
                                 </div>
-                        )
-                    }
+                                <div className={"column is-full has-text-left mt-3"}>
+                                    <h3>Judul : {ele.title}</h3>
+                                 
+                                    <h3>Authors : {ele.author}</h3>
+                                    <br />
+                                    <Rater total={5} rating={ele.rating} />
+                                    <h3>Rating : {ele.rating_count}</h3>
+                                    <button data-id={ele.id} onClick={this.handleSaveWishlist}  className={"button is-danger mt-3"}>Wishlist</button>
+                                </div>
+                            </div>
+                        </div>
+                    )
                 }
             }
             
@@ -102,13 +88,65 @@ class BookIndex extends React.Component {
         }
     };
 
-    handleSaveWishlist(e) {
+    async handleSaveWishlist(e) {
+        if (localStorage.getItem('idBrowser') !== null) {
+            const idBook = e.currentTarget.dataset.id;
 
+            let jsonBook = {}
+
+            for (const key in this.dataBook) {
+                if (Object.hasOwnProperty.call(this.dataBook, key)) {
+                    const ele = this.dataBook[key];
+                    if (idBook === ele.id) {
+                        jsonBook = ele
+                        break;
+                    }
+                }
+            }
+
+            let postBook = await ApiPostBook.wishlist(localStorage.getItem('idBrowser'),jsonBook)
+
+            if (postBook.status === 200 && postBook !== false) {
+                Store.addNotification({
+                    title: "Success!",
+                    message: postBook.message,
+                    type: "success",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                      duration: 3000,
+                      onScreen: true
+                    }
+                });
+            } else {
+                Store.addNotification({
+                    title: "Warning!",
+                    message: postBook.message,
+                    type: "warning",
+                    insert: "top",
+                    container: "top-right",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                      duration: 3000,
+                      onScreen: true
+                    }
+                });
+            }
+        }
     }
 
     render() {
+        if (localStorage.getItem('idBrowser') === null) {
+            localStorage.setItem('idBrowser',uuidv4())
+        }
+        
         return (
             <div>
+                <ReactNotifications />
+
                 <div className={"columns p-5"}>
                     <div className={"column is-3 mt-3"}>
                         <h3>Silakan cari judul buku yang anda inginkan : </h3>
